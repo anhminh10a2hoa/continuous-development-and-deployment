@@ -1,0 +1,12 @@
+  │  ~/De/t/COMP.S/brmiho │   exercise1 !2  docker container ls
+CONTAINER ID   IMAGE             COMMAND                  CREATED          STATUS                  PORTS      NAMES
+87cc772eda30   brmiho-service2   "docker-entrypoint.s…"   42 minutes ago   Up Less than a second   8000/tcp   brmiho-service2-1
+
+  │  ~/De/t/COMP.S/brmiho │   exercise1 !2  docker network ls
+NETWORK ID     NAME               DRIVER    SCOPE
+206f7f1994bd   bridge             bridge    local
+5c9e0a73f228   brmiho_backend     bridge    local
+ddff667735c5   brmiho_default     bridge    local
+8c387dcff784   brmiho_mynetwork   bridge    local
+95b19bceee3d   host               host      local
+69ac5ca8ce2a   none               null      local

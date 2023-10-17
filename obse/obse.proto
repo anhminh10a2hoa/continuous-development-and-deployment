@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package obse;
+
+service OBSE {
+  rpc logMessage (LogEntry) returns (LogResponse);
+}
+
+message LogEntry {
+  string timestamp = 1;
+  string topic = 2;
+  string message = 3;
+}
+
+message LogResponse {
+  string result = 1;
+}

@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  orig:
+    build:
+      context: ./orig
+    ports:
+      - "50051:50051"
+
+  imed:
+    build:
+      context: ./imed
+    depends_on:
+      - orig
+
+  obse:
+    build:
+      context: ./obse
+    depends_on:
+      - orig
+    volumes:
+      - ./obse/logs:/app/logs  # Mount a volume for log files
+
+  httpserv:
+    build:
+      context: ./httpserv
+    ports:
+      - "8080:8080"
+    depends_on:
+      - obse
+    volumes:
+      - ./obse/logs/log.txt:/app/logs/log.txt

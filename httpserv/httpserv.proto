@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package httpserv;
+
+service HTTPSERV {
+  // No RPC methods in this case
+}
+
+// You can define other messages or request/response types here if needed.

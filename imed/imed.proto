@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package imed;
+
+service IMED {
+  rpc publishMessage (MessageRequest) returns (MessageResponse);
+}
+
+message MessageRequest {
+  string message = 1;
+}
+
+message MessageResponse {
+  string result = 1;
+}

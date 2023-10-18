@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .  # Use the current directory (where the Dockerfile is located)
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"  # Map port 8080 in the container to port 8080 on the host
+    volumes:
+      - ./log.txt:/app/log.txt  # Mount the log file so it's persisted outside the container
+    restart: always

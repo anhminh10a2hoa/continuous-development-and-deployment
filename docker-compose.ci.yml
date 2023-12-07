@@ -1,0 +1,15 @@
+version: "3.1"
+services:
+  CI:
+    image: ci
+    hostname: ci
+    build:
+      context: ./ci-test
+
+    depends_on:
+      - rabbitmq
+      - apigateway
+      - messagebroker
+      - service1
+      - service2
+      - ORIGmonitor

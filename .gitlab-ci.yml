@@ -1,0 +1,12 @@
+stages:
+  - start
+
+start:
+  image: docker/compose
+  stage: start
+  services:
+    - docker:dind
+
+  script:
+    - docker-compose -f docker-compose.yml up -d --build
+    - docker-compose -f docker-compose.ci.yml -f docker-compose.yml up --build --exit-code-from=CI CI

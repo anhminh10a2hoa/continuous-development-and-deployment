@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  apigateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "8083:8083"
+    depends_on:
+      - monitor
+
+  messagebroker:
+      build:
+        context: ./message-broker
+      ports:
+        - "8002:8002"
+
+  service1:
+    build:
+      context: ./service1
+    ports:
+      - "8000:8000"
+    depends_on:
+      - messagebroker
+
+  service2:
+    build:
+      context: ./service2
+    ports:
+      - "8001:8001"
+    depends_on:
+      - messagebroker
+
+  monitor:
+    build:
+      context: ./monitor
+    ports:
+      - "8003:8003"

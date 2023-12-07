@@ -1,13 +1,22 @@
 const express = require('express');
-const axios = require('axios');
+const amqp = require('amqplib');
 
 const app = express();
 const PORT = 8000;
+const RABBITMQ_URL = 'amqp://rabbitmq';
 
 // Assuming Service 1 sends messages continuously
 setInterval(async () => {
+    const newMessage = 'Hello from Service 1';
+
     try {
-        await axios.post('http://message-broker/send-message', { message: 'Hello from Service 1' });
+        const connection = await amqp.connect(RABBITMQ_URL);
+        const channel = await connection.createChannel();
+        await channel.assertQueue('messages');
+        channel.sendToQueue('messages', Buffer.from(newMessage));
+        await connection.close();
+
+        console.log(`Sent message to RabbitMQ: ${newMessage}`);
     } catch (error) {
         console.error(error);
     }

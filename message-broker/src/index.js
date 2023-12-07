@@ -1,29 +1,38 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const amqp = require('amqplib');
 
 const app = express();
-const PORT = 8003;
+const PORT = 8002;
+const RABBITMQ_URL = 'amqp://rabbitmq';
 
-const stateLog = [];
+const messages = [];
 
 app.use(bodyParser.json());
 
-app.put('/state', (req, res) => {
-    const newState = req.body.state;
-    stateLog.push(`${new Date().toISOString()}: ${stateLog.length > 0 ? stateLog[stateLog.length - 1] + '->' : ''}${newState}`);
-    console.log(`State updated to: ${newState}`);
-    res.send('State updated successfully');
+app.post('/send-message', async (req, res) => {
+    const newMessage = req.body.message;
+
+    try {
+        const connection = await amqp.connect(RABBITMQ_URL);
+        const channel = await connection.createChannel();
+        await channel.assertQueue('messages');
+        channel.sendToQueue('messages', Buffer.from(newMessage));
+        await connection.close();
+
+        messages.push(newMessage);
+        console.log(`Sent message to RabbitMQ: ${newMessage}`);
+        res.send('Message sent successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
-app.get('/state', (req, res) => {
-    const currentState = stateLog.length > 0 ? stateLog[stateLog.length - 1].split('->')[1] : 'INIT';
-    res.send(currentState);
-});
-
-app.get('/run-log', (req, res) => {
-    res.json(stateLog);
+app.get('/messages', (req, res) => {
+    res.json(messages);
 });
 
 app.listen(PORT, () => {
-    console.log(`Monitor is running on port ${PORT}`);
+    console.log(`Message Broker is running on port ${PORT}`);
 });

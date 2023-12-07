@@ -10,4 +10,6 @@ COPY . .
 
 EXPOSE 8083
 
-CMD ["node", "index.js"]
+RUN npm ci
+
+ENTRYPOINT node ./src/index.js

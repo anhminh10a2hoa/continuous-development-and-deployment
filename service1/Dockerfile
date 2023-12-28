@@ -1,15 +1,13 @@
 FROM node:15
 
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
+WORKDIR /service1
 
 COPY . .
 
-EXPOSE 8000
+RUN pip install -r requirements.txt
 
-RUN npm ci
+COPY ./wait-for-it.sh ./monitor/wait-for-it.sh
+RUN chmod +x ./monitor/wait-for-it.sh
 
-ENTRYPOINT node ./src/index.js
+# Wait for rabbitmq to be up
+CMD ["./monitor/wait-for-it.sh", "rabbitmq:5672",  "--timeout=0", "--", "node", "monitor.js"]

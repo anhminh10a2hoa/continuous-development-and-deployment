@@ -1,12 +1,24 @@
+image: docker:latest
+
 stages:
-  - start
+  - build
+  - test
+  - deploy
 
-start:
-  image: docker/compose
-  stage: start
-  services:
-    - docker:dind
-
+build:
+  stage: build
   script:
-    - docker-compose -f docker-compose.yml up -d --build
-    - docker-compose -f docker-compose.ci.yml -f docker-compose.yml up --build --exit-code-from=CI CI
+    - docker-compose build
+
+test:
+  stage: test
+  script:
+    - echo "test phase here"
+
+deploy:
+  stage: deploy
+  script:
+    - docker-compose up --build
+    - echo "deployment phase here"
+  dependencies:
+    - build

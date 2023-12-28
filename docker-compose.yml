@@ -3,41 +3,28 @@ version: '3'
 services:
   rabbitmq:
       image: rabbitmq:3-management
-      ports:
-        - 5672:5672
-
-  apigateway:
-    build:
-      context: ./api-gateway
-    ports:
-      - "8083:8083"
-    depends_on:
-      - monitor
-
-  messagebroker:
-      build:
-        context: ./message-broker
-      ports:
-        - "8002:8002"
+      networks:
+        - ex2network
 
   service1:
     build:
       context: ./service1
-    ports:
-      - "8000:8000"
-    depends_on:
-      - messagebroker
+    networks:
+      - ex2network
 
   service2:
     build:
       context: ./service2
-    ports:
-      - "8001:8001"
-    depends_on:
-      - messagebroker
+    networks:
+      - ex2network
 
   monitor:
     build:
       context: ./monitor
     ports:
-      - "8003:8003"
+      - "8087:8087"
+    networks:
+      - ex2network
+
+networks:
+  ex2network:

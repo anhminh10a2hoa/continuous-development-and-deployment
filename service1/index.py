@@ -16,14 +16,14 @@ signal.signal(signal.SIGTERM, signal_handler)
 counter = 1
 
 # ip address and URL for service 2
-address = socket.gethostbyname("service2.laurira")
+address = socket.gethostbyname("service2")
 service2_url = f"http://{address}:8000/"
 
 # Offset for +3 UTC
 offset = timedelta(hours=3)
 
 # Connect to RabbitMQ server
-connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq.laurira'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
 channel = connection.channel()
 
 # Bind exchnages for different topics

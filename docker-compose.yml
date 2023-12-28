@@ -2,9 +2,10 @@ version: '3'
 
 services:
   rabbitmq:
-      image: rabbitmq:3-management
-      networks:
-        - ex2network
+    image: rabbitmq:3
+    container_name: rabbitmq
+    networks:
+      - ex2network
 
   service1:
     build:
@@ -21,10 +22,10 @@ services:
   monitor:
     build:
       context: ./monitor
-    ports:
-      - "8087:8087"
     networks:
       - ex2network
+    ports:
+      - "8087:8087"
 
 networks:
   ex2network:

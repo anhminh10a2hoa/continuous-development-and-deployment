@@ -6,7 +6,7 @@ COPY . .
 
 RUN npm install
 
-EXPOSE 8002
+EXPOSE 8003
 
 RUN ["chmod", "+x", "./wait-for-it.sh"]
 

@@ -1,16 +1,13 @@
-FROM node:15
+FROM python:3
 
-WORKDIR /service2
+WORKDIR /usr/src/app
 
-COPY package*.json ./
-COPY index.js ./index.js
+COPY . .
 
-RUN npm install
-
-COPY wait-for-it.sh ./service2/wait-for-it.sh
-RUN chmod +x ./service2/wait-for-it.sh
+RUN pip install --no-cache-dir pika
 
 EXPOSE 8000
 
-# Wait for rabbitmq to be up
-CMD ["./service2/wait-for-it.sh", "rabbitmq:5672", "--timeout=0", "--", "node", "index.js"]
+RUN ["chmod", "+x", "./wait-for-it.sh"]
+
+ENTRYPOINT ./wait-for-it.sh rabbitmq:5672 --timeout=20 --quiet --strict -- python3 -u ./index.py

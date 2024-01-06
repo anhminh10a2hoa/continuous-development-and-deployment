@@ -1,14 +1,13 @@
-FROM python:3.9
+FROM node:15
 
-WORKDIR /service1
+WORKDIR /usr/src/application
 
-COPY index.py ./index.py
-COPY requirements.txt ./requirements.txt
+COPY . .
 
-RUN pip install -r requirements.txt
+RUN npm install
 
-COPY wait-for-it.sh ./service1/wait-for-it.sh
-RUN chmod +x ./service1/wait-for-it.sh
+EXPOSE 8001
 
-# Wait for rabbitmq to be up
-CMD ["./service1/wait-for-it.sh", "service2:8000", "--timeout=5", "--", "./service1/wait-for-it.sh", "monitor:8087", "--timeout=5", "--", "python", "index.py"]
+RUN ["chmod", "+x", "./wait-for-it.sh"]
+
+ENTRYPOINT ./wait-for-it.sh rabbitmq:5672 --timeout=20 --quiet --strict -- node ./index.js

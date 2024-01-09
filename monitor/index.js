@@ -60,8 +60,6 @@ app.post('/reset', (req, res) => {
   res.status(200).send();
 });
 
-configureEnvVariables();
-
 const server = app.listen(8002, async () => {
   console.log(`HTTP server running on port 8002`);
 

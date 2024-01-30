@@ -1,10 +1,15 @@
 const express = require('express');
 const amqp = require('amqplib');
 const app = express();
-let channel;
+let amqpChannel;
 const logs = [];
 
-
+/**
+ * Initializes the AMQP connection and sets up queues and exchanges.
+ * @param {Object} options - The configuration options for AMQP initialization.
+ * @param {string[]} options.queueNames - Array of queue names to be initialized.
+ * @returns {Promise<Channel>} - The AMQP channel.
+ */
 const initializeAmqp = async ({ queueNames }) => {
   try {
     const connection = await amqp.connect('amqp://minhhoang:1234@rabbitmq');
@@ -17,10 +22,14 @@ const initializeAmqp = async ({ queueNames }) => {
     }
     return channel;
   } catch (err) {
-    console.log(`Encountered an error during amqp initialization: ${err}`);
+    console.error(`Error during AMQP initialization: ${err}`);
   }
 };
 
+/**
+ * Consumes log messages from the 'log' queue.
+ * @param {Channel} channel - The AMQP channel.
+ */
 const consumeLogMessages = (channel) =>
   channel.consume(
     'log',
@@ -36,6 +45,10 @@ const consumeLogMessages = (channel) =>
     { noAck: false }
   );
 
+/**
+ * Consumes state messages from the 'state-monitor' queue.
+ * @param {Channel} channel - The AMQP channel.
+ */
 const consumeStateMessages = (channel) =>
   channel.consume(
     'state-monitor',
@@ -44,43 +57,59 @@ const consumeStateMessages = (channel) =>
       channel.ack(msg);
 
       const state = msg.content.toString('utf8');
+      // Validate the received state values
       if (state !== 'INIT' && state !== 'PAUSED' && state !== 'RUNNING' && state !== 'SHUTDOWN') return;
+      // Handle shutdown state
       if (state === 'SHUTDOWN') await shutDownServer();
     },
     { noAck: false }
   );
 
+/**
+ * Express route to get aggregated logs.
+ */
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/plain');
   res.send(logs.join(''));
 });
 
+/**
+ * Express route to reset logs.
+ */
 app.post('/reset', (req, res) => {
   logs.splice(0, logs.length);
   res.status(200).send();
 });
 
-const server = app.listen(8002, async () => {
-  console.log(`HTTP server running on port 8002`);
+/**
+ * Starts the HTTP server and initializes AMQP channels and message consumers.
+ */
+const startServer = async () => {
+  console.log(`Monitor running on port 8002`);
 
-  channel = await initializeAmqp({
+  amqpChannel = await initializeAmqp({
     queueNames: ['log', 'state-monitor'],
   });
-  if (!channel) return;
+  if (!amqpChannel) return;
 
-  consumeLogMessages(channel);
-  consumeStateMessages(channel);
-  console.log(
-    `Consuming log, state-monitor messages 🥕`
-  );
-});
+  consumeLogMessages(amqpChannel);
+  consumeStateMessages(amqpChannel);
+  console.log(`Consuming log`);
+};
 
+/**
+ * Handles server shutdown gracefully.
+ */
 const shutDownServer = async () => {
-  console.log('Shutting down');
-  await channel?.close();
+  console.log('Shutting down monitor...');
+  await amqpChannel?.close();
   server.close();
   process.exit(0);
 };
 
+// Handle graceful shutdown on SIGTERM and SIGINT signals
 process.on('SIGTERM', shutDownServer);
 process.on('SIGINT', shutDownServer);
+
+// Start the server
+const server = app.listen(8002, startServer);

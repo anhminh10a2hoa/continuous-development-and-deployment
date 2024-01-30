@@ -46,7 +46,7 @@ class RabbitMQConsumer:
     def _on_state_callback(self, channel, method, properties, body):
         state = body.decode("utf-8")
         if state == "SHUTDOWN":
-            print("Shutting down")
+            print("Shutting down service2...")
             channel.close()
             os._exit(1)
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
         produce_queue_name=RABBITMQ_LOG_QUEUE,
     )
     web_server = HTTPServer((HOST_NAME, SERVER_PORT), handler_partial)
-    print(f"HTTP server running on port {SERVER_PORT}")
+    print(f"Service2 running on port {SERVER_PORT}")
 
     consumer = RabbitMQConsumer(
         consume_queue=RABBITMQ_MESSAGE_QUEUE,

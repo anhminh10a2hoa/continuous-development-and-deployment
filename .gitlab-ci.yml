@@ -1,0 +1,24 @@
+image: docker:latest
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker-compose build
+
+test:
+  stage: test
+  script:
+    - echo "test phase here"
+
+deploy:
+  stage: deploy
+  script:
+    - docker-compose up --build
+    - echo "deployment phase here"
+  dependencies:
+    - build

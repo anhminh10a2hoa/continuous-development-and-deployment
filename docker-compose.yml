@@ -1,0 +1,61 @@
+version: "3"
+services:
+  service1:
+    depends_on:
+      - rabbitmq
+    build:
+      dockerfile: Dockerfile
+      context: ./service1
+    image: service1
+    container_name: service1
+    expose:
+      - 8001
+    networks:
+      - servicenet
+  service2:
+    build:
+      dockerfile: Dockerfile
+      context: ./service2
+    image: service2
+    container_name: service2
+    expose:
+      - 8000
+    networks:
+      - servicenet
+  monitor:
+    depends_on:
+      - rabbitmq
+    build:
+      dockerfile: Dockerfile
+      context: ./monitor
+    image: monitor
+    container_name: monitor
+    expose:
+      - 8002
+    networks:
+      - servicenet
+  api-gateway:
+    depends_on:
+      - rabbitmq
+    build:
+      dockerfile: Dockerfile
+      context: ./api-gateway
+    image: api-gateway
+    container_name: api-gateway
+    ports:
+      - 8083:8003
+    networks:
+      - servicenet
+  rabbitmq:
+    image: rabbitmq:3.10
+    container_name: rabbitmq
+    expose:
+      - 5672
+    networks:
+      - servicenet
+    environment:
+      RABBITMQ_DEFAULT_USER: minhhoang
+      RABBITMQ_DEFAULT_PASS: 1234 
+
+networks:
+  servicenet:
